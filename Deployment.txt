@@ -1,0 +1,261 @@
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    Deployment.txt                                     :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: dmukaliy <dmukaliy@student.42.fr>          +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2020/02/03 18:17:58 by dmukaliy          #+#    #+#              #
+#    Updated: 2020/02/03 19:16:39 by dmukaliy         ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
+
+____________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
+VM Part
+
+download debian-live-10.2.0-amd64-standard.iso from https://cdimage.debian.org/debian-cd/current-live/amd64/iso-hybrid/
+Virtual Machine Installation
+: Instal Virtual Box VM 
+: Create a new Debian Virtual Machine 
+: Choose a hostname 
+: Setup the root password
+: Create a non root user and a password
+: Setup Debian with partitioning 4.6GB
+
+su -							//go to the root
+sudo apt-get update 			//update the list of available packages and their versions, but it does not install or upgrade any packages.
+sudo apt-get upgrade 			//install newer versions of the packages. After updating the lists, the package manager knows about available updates for the software you have installed.
+
+____________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
+Network and Security Part
+
+
+<<<1>>> Create a non-root user and setup Sudo rights for this user
+
+apt-get install ssh sudo vim					//install sudo, vim and ssh package
+adduser <username>								//create a new user
+awk  -F : '/home/ {print $1 }' /etc/passwd 		//see all users
+chmod 640 /etc/sudoers 							//to change rights to sudoers file
+visudo /etc/sudoers								//add after 
+																	# User privilege specification
+																	root         ALL=(ALL:ALL) ALL
+																	username     ALL=(ALL:ALL) NOPASSWD:ALL
+exit											//exit from the root user
+
+
+<<<2>>> Setup static IP and a Netmask in \30
+
+In the settings of VM change Network-attached to from NAT  Bridged Adapter
+ip a						//to see what interfaces are we have
+sudo vim /etc/network/interfaces				//change this file to 
+												# This file describes the network interfaces available on your system
+												# and how to activate them. For more information, see interfaces(5).
+
+												source /etc/network/interfaces.d/*
+
+												# The loopback network interface
+												auto lo
+												iface lo inet loopback
+
+												# The primary network interface
+												auto enp0s3
+sudo vim /etc/network/interfaces.d/enp0s3		//and put there
+												iface enp0s3 inet static
+													address 10.13.200.215					//I choose this address
+													netmask 255.255.255.252 				// because we need a Netmask in \30. Subnet Mask: http://www.sput.nl/internet/netmask-table.html
+													gateway 10.13.254.254 					//netstat -rn to see gateway or ip r | grep default
+sudo rm /etc/network/interfaces.d/setup			//remove it if exists or change according to enp0s3
+sudo service networking restart					//restart the network
+ip a											//to see our ip
+
+
+<<<3>>>Default port of the SSH service, SSH access with publickeys
+
+sudo vim /etc/ssh/sshd_config 														//change line 13 to <Port 50000> without # (System Ports (0-1023) this is forbidden to use, User Ports (1024-49151) this should be avoided as well, and the Dynamic and/or Private Ports (49152-65535) this range can be used)
+sudo service sshd restart
+ssh diana@10.13.215.215 -p 50000													//connect via ssh with this port
+ssh-keygen -t rsa																	//in Mac run this command and choose something for the passphrase. It generated id_rsa: our private key, and id_rsa.pub: a public key.
+ssh-copy-id -i /Users/dmukaliy/.ssh/id_rsa.pub diana@10.13.215.215 -p 50000			//The public key is automatically added in "~/.ssh/authorized_keys" on the server.
+sudo vim /etc/ssh/sshd_config														//to disable password authentication and login change line 32,37,56. It should look like this:
+																	PermitRootLogin no
+																	PasswordAuthentication yes
+																	PubkeyAuthentication yes
+sudo service sshd restart															//to restart ssh service
+
+
+<<<4>>>Set the rules of firewall on server only with the services used outside the VM
+
+sudo apt-get install ufw						//The default firewall configuration tool for Ubuntu is ufw
+sudo ufw status 								//if it is inactive then run
+sudo ufw enable									//if it is not enabled
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+sudo ufw allow 443								//incoming HTTPS (port 443) connections
+sudo ufw allow 80/tcp							//incoming HTTP(port 80) connections
+sudo ufw allow 50000/tcp						//incoming SSH connections
+sudo ufw reload
+
+
+<<<5>>>Setiing up a DOS (Denial Of Service Attack) protection on open ports
+
+sudo apt-get install apache2											//install apache
+sudo apt-get install fail2ban											//to install
+service fail2ban status
+sudo cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local				//copy will prevent changes from being overwritten if a package update provides a new default file
+sudo vim /etc/fail2ban/jail.localwe should add to jail.local file 		//
+	[sshd]
+	enabled = true 														//it was the same
+	port    = ssh 														//it was by default
+	logpath = %(sshd_log)s 												//by default
+	backend = %(sshd_backend)s 											//by default
+	maxretry = 3														//add this line
+	bantime = 600														//add this line
+
+	//Add after HTTP servers:
+	[http-get-dos]
+	enabled = true
+	port = http,https
+	filter = http-get-dos
+	logpath = /var/log/apache2/access.log
+	maxretry = 150
+	findtime = 200
+	bantime = 660
+	action = iptables[name=HTTP, port=http, protocol=tcp]
+sudo touch /etc/fail2ban/filter.d/http-get-dos.conf						//we need to create the filter, http-get-dos.conf
+					[Definition]
+					failregex = ^<HOST> -.*"(GET|POST).*
+					ignoreregex = 
+sudo ufw reload
+sudo service fail2ban restart
+Can test with slowloris:
+					sudo apt-get install git
+					git clone https://github.com/gkbrk/slowloris.git
+					cd slowloris
+					perl slowloris.py 10.13.200.215
+sudo cat /var/log/fail2ban.log											//To see full list of IPs that have been blocked
+
+
+<<<6>>>Setting up a protection against scans on VM’s open ports
+
+sudo apt-get install nmap			//install nmap tool Nmap works by sending data packets on a specific target (by IP) and by interpreting the incoming packets to determine what posts are open/closed, what services are running on the scanned system, whether firewalls or filters are set up and enabled, and finally what operation system is running.
+sudo nmap 10.13.200.215				//Scan using IP Address
+sudo apt-get install portsentry		//PortSentry is part of the Abacus Project suite of security tools. It is a program designed to detect and respond to port scans against a target host in real-time.
+									PortSentry will detect SYN/half-open, FIN, NULL, X-MAS and oddball packet stealth scans.
+									PortSentry has an internal state engine to remember hosts that connected previously. This allows the setting of a trigger value to prevent false alarms and detect "random" port probing. PortSentry will report all violations to the local or remote syslog daemons indicating the system name, time of attack, 
+									attacking host IP and the TCP or UDP port a connection attempt was made to. Once a scan is detected your system will turn into a blackhole and disappear from the attacker.
+sudo vim /etc/default/portsentry	//change tcp and udp to atcp and aupd (advanced)
+sudo vim /etc/portsentry/portsentry.conf		//Ignore Options are:
+												# 0 = Do not block UDP/TCP scans
+												# 1 = Block UDP/TCP scans.
+												# 2 = Run external command only (KILL_RUN_CMD)
+							we need to change BLOCK_UDP and BLOCK_TCP to "1"
+							need to omment the current KILL_ROUTE command and uncomment <<< KILL_ROUTE="/sbin/iptables -I INPUT -s $TARGET$ -j DROP"   >>>>>
+												//This will drop all packets originating from an attacker’s IP address and log future connection attempts.
+							need to comment <<<< KILL_HOSTS_DENY="ALL: $TARGET$ : DENY >>>>>				//So the SSH access is not denied.
+sudo service portsentry restart
+
+<<<7>>>Stoping the services we don’t need for this project
+
+sudo systemctl list-unit-files --type=service | grep enabled							//to see all enabled services
+sudo systemctl disable bluetooth.service
+sudo systemctl disable console-setup.service
+sudo systemctl disable keyboard-setup.service
+sudo systemctl disable syslog.service
+sudo systemctl disable haveged.service
+sudo systemctl disable wpa_supplicant.service
+
+
+<<<8>>>Script that updates all the sources of package and logs the whole in /var/log/update_script.log, scheduled task
+
+sudo touch /var/log/update_script.log
+sudo chmod 777 /var/log/update_script.log
+echo "sudo apt-get update -y >> /var/log/update_script.log" > /home/diana/update_packages.sh
+echo "sudo apt-get upgrade -y >> /var/log/update_script.log" >> /home/diana/update_packages.sh
+sudo chmod 755 update_packages.sh 
+sudo crontab -e					
+						@reboot sudo /home/diana/update_packages.sh
+						0 4 * * 7 sudo home/diana/update_packages.sh
+
+
+<<<9>>>Script to monitor changes of the /etc/crontab file and sends an email to root, add to scheduled tasks
+
+sudo apt install mailutils postfix
+sudo vim ~/cronmonitor.sh					//created script to monitor and send email
+				#!/bin/bash
+
+				FILE_PREV_COPY="/var/tmp/monitor_cron"
+				FILE_REAL_CRON="/etc/crontab"
+
+				if [ ! -f $FILE_PREV_COPY ]
+				then
+					sudo cat $FILE_REAL_CRON  > $FILE_PREV_COPY
+					exit 0;
+				fi;
+
+				result=$(diff /etc/crontab /var/tmp/monitor_cron)
+
+				if [ ! -z "$result" ]
+				then
+					sudo cat $FILE_REAL_CRON  > $FILE_PREV_COPY
+					echo "$FILE_REAL_CRON has been changed! Take a look." | mail -s "$FILE_REAL_CRON was changed!" root
+				fi;
+sudo crontab -e								//adding 0 0 * * * sudo /home/diana/cronmonitor.sh
+sudo mail									//to check unreaded mails for root
+mail										//to check unreaded mails for user
+sudo cat /var/mail/*						//to see all mails
+
+____________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
+Web Part
+
+<<<1>>>Web server
+
+Create or copy or take some template from web an index.html						//I copied on MAC
+scp -P 50000 ./roger-skyline/index.html diana@10.13.200.215:/home/diana/		// from MAC
+sudo mv index.html /var/www/html/												//copy in debian  /var/www/html folder which was created with the installation of apache2
+
+
+<<<2>>>Setting up a self-signed SSL on all of services
+lsb_release -a												//to see version
+															TLS, or transport layer security, and its predecessor SSL, which stands for secure sockets layer, are web protocols used to wrap normal traffic in a protected, encrypted wrapper.
+															Using this technology, servers can send traffic safely between the server and clients without the possibility of the messages being intercepted by outside parties.
+															The certificate system also assists users in verifying the identity of the sites that they are connecting with.
+
+			<<<<<Step 1: Create the SSL Certificate:
+sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/apache-selfsigned.key -out /etc/ssl/certs/apache-selfsigned.crt	//these options will create both a key file and a certificate
+sudo openssl dhparam -out /etc/ssl/certs/dhparam.pem 2048																							//create a strong Diffie-Hellman group, which is used in negotiating Perfect Forward Secrecy with clients.
+
+			<<<<<Step 2: Configure Apache to Use SSL:
+sudo vim /etc/apache2/conf-available/ssl-params.conf																								//Create a new snippet in the /etc/apache2/conf-available directory
+															SSLCipherSuite EECDH+AESGCM:EDH+AESGCM:AES256+EECDH:AES256+EDH
+															SSLProtocol All -SSLv2 -SSLv3 -TLSv1 -TLSv1.1
+															SSLHonorCipherOrder On
+															# Disable preloading HSTS for now.  You can use the commented out header line that includes
+															# the "preload" directive if you understand the implications.
+															# Header always set Strict-Transport-Security "max-age=63072000; includeSubDomains; preload"
+															Header always set X-Frame-Options DENY
+															Header always set X-Content-Type-Options nosniff
+															# Requires Apache >= 2.4
+															SSLCompression off
+															SSLUseStapling on
+															SSLStaplingCache "shmcb:logs/stapling-cache(150000)"
+															# Requires Apache >= 2.4.11
+															SSLSessionTickets Off
+sudo cp /etc/apache2/sites-available/default-ssl.conf /etc/apache2/sites-available/default-ssl.conf.bak												//back up the original SSL Virtual Host file
+sudo vim /etc/apache2/sites-available/default-ssl.conf
+															ServerAdmin dmukaliy@student.hive.fi
+															ServerName 10.13.200.215
+															SSLCertificateFile      /etc/ssl/certs/apache-selfsigned.crt
+															SSLCertificateKeyFile /etc/ssl/private/apache-selfsigned.key
+sudo vim /etc/apache2/sites-available/000-default.conf																								//need to add a Redirect directive,
+															 Redirect "/" "https://10.13.200.215/"
+
+			<<<<<Step 3 — Enabling the Changes in Apache:
+sudo a2enmod ssl												//Enable mod_ssl, the Apache SSL module, and mod_headers
+sudo a2enmod headers
+sudo a2ensite default-ssl											// enable SSL Virtual Host with the a2ensite command
+sudo a2enconf ssl-params											//need to enable ssl-params.conf file, to read in the values we’ve set
+sudo apache2ctl configtest											//We should check to make sure that there are no syntax errors in our files. 
+sudo systemctl restart apache2
+
+https://10.13.200.215/
+http://10.13.200.215			results are the same icon, this means that redirect worked correctly. 
