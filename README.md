@@ -10,8 +10,8 @@ More detailed information you can see [here](https://github.com/DianaMukaliyeva/
 ```bash
 git clone https://github.com/DianaMukaliyeva/Roger-skyline-1.git
 cd Roger-skyline-1
-```bash
+```
 To test Roger-skyline with "from_mac.sh" script you need to send file "test.sh" to the VM's user and run the lat script on VM
 ```bash
 ./from_Mac.sh
-```bash
+```
