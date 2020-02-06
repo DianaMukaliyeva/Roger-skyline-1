@@ -4,6 +4,7 @@ red=`tput setaf 1`
 green=`tput setaf 2`
 blue=`tput setaf 4`
 reset=`tput sgr0`
+# change below values to yours
 name=diana
 remotehost=10.13.200.215
 remoteport=50000
