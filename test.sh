@@ -184,8 +184,7 @@ ${green}your answer: ${reset}" part
 	${green}What do you want to do?
 	${blue}1${reset} check that the package of a Web server is installed
 	${blue}2${reset} check that there are only one active configuration
-	${blue}3${reset} check web application
-	${blue}4${reset} exit
+	${blue}3${reset} exit
 	${green}your answer: ${reset}" check
 			if [ $check == 1 ]
 			then
@@ -196,10 +195,6 @@ ${green}your answer: ${reset}" part
 				echo "${mag}sudo cat /etc/apache2/sites-available/000-default.conf${reset}"
 				tput setaf 3; sudo cat /etc/apache2/sites-available/000-default.conf
 			elif [ $check == 3 ]
-			then
-				echo "${mag}sudo apt list --upgradable${reset}"
-				tput setaf 3; sudo apt list --upgradable
-			elif [ $check == 5 ]
 			then
 				break
 			else
