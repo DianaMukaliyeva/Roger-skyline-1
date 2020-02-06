@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<title>W3.CSS Template</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
+<style>
+body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
+.w3-third img{margin-bottom: -6px; opacity: 0.8; cursor: pointer}
+.w3-third img:hover{opacity: 1}
+</style>
+<body class="w3-light-grey w3-content" style="max-width:1600px">
+
+<!-- Sidebar/menu -->
+<nav class="w3-sidebar w3-bar-block w3-white w3-animate-left w3-text-grey w3-collapse w3-top w3-center" style="z-index:3;width:300px;font-weight:bold" id="mySidebar"><br>
+  <h3 class="w3-padding-64 w3-center"><b>Diana</b></h3>
+  <a href="javascript:void(0)" onclick="w3_close()" class="w3-bar-item w3-button w3-padding w3-hide-large">CLOSE</a>
+  <a href="#" onclick="w3_close()" class="w3-bar-item w3-button">PICTURES</a> 
+  <a href="#about" onclick="w3_close()" class="w3-bar-item w3-button">ABOUT HIVE</a> 
+  <a href="#contact" onclick="w3_close()" class="w3-bar-item w3-button">CONTACT</a>
+</nav>
+
+<!-- Top menu on small screens -->
+<header class="w3-container w3-top w3-hide-large w3-white w3-xlarge w3-padding-16">
+  <span class="w3-left w3-padding">ROGER-SKYLINE</span>
+  <a href="javascript:void(0)" class="w3-right w3-button w3-white" onclick="w3_open()">☰</a>
+</header>
+
+<!-- Overlay effect when opening sidebar on small screens -->
+<div class="w3-overlay w3-hide-large w3-animate-opacity" onclick="w3_close()" style="cursor:pointer" title="close side menu" id="myOverlay"></div>
+
+<!-- !PAGE CONTENT! -->
+<div class="w3-main" style="margin-left:300px">
+
+  <!-- Push down content on small screens --> 
+  <div class="w3-hide-large" style="margin-top:83px"></div>
+  
+  <!-- Photo grid -->
+  <div class="w3-row">
+    <div class="w3-third">
+      <img src="https://apply.hive.fi/assets/hivelogo7-28ffacbad276a1f25a4457ecbdae7fb6109d21488d283a4ea88a09dcbf69c9da.png" style="width:100%" onclick="onClick(this)" alt="hive">
+      <img src="https://images.ctfassets.net/7oor54l3o0n4/32BkWoYfCg6Ky28uCKYSIO/18c6024ddabb4f1356fc5a91d3bed92d/campus.jpg?w=2560&q=50" style="width:100%" onclick="onClick(this)" alt="hive">
+      <img src="https://pbs.twimg.com/media/DtpSdW_X4AEc7St.jpg" style="width:100%" onclick="onClick(this)" alt="hive">
+    </div>
+
+    <div class="w3-third">
+      <img src="https://images.almatalent.fi/cx334,cy0,cw2666,ch2000,650x/https://assets.almatalent.fi/image/bd19a029-86dd-595c-a185-a8d3afbea3ce" style="width:100%" onclick="onClick(this)" alt="hive">
+      <img src="https://images.ctfassets.net/7oor54l3o0n4/54yoVP1MOOqPkZg9S59YlA/29d610b4f98c4a09964ca5fac1ead827/46B27EF2-4C2E-4A55-814A-1F04CD9D9040.JPG?w=2560&q=50" style="width:100%" onclick="onClick(this)" alt="hive">
+      <img src="https://kiinteistot.elo.fi/-/media/toimitilat_elo_fi-kuvat/artikkelit/elo_hive-2.ashx?la=fi-fi&hash=DEE307A40EEDF8FDAFC7C34EEBEE44CCBA84CFD8" style="width:100%" onclick="onClick(this)" alt="hive">
+    </div>
+    
+    <div class="w3-third">
+      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcSFXR2z4NorbCV9UM7p1qa8shBKdOfAApMLAvA0Y8F6no_0ebLQ" style="width:100%" onclick="onClick(this)" alt="hive">
+      <img src="https://hs.mediadelivery.fi/img/1920/f2eb638346a8496d951ce46088cf3b02.jpg" style="width:100%" onclick="onClick(this)" alt="hive">
+      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcQZbE7Ivf9OrqCi5W92kGzkrMlh_mOBZriFDBRMgQKk_7-38cHj" style="width:100%" onclick="onClick(this)" alt="hive">
+    </div>
+  </div>
+  
+  <!-- Modal for full size images on click-->
+  <div id="modal01" class="w3-modal w3-black" style="padding-top:0" onclick="this.style.display='none'">
+    <span class="w3-button w3-black w3-xlarge w3-display-topright">×</span>
+    <div class="w3-modal-content w3-animate-zoom w3-center w3-transparent w3-padding-64">
+      <img id="img01" class="w3-image">
+      <p id="caption"></p>
+    </div>
+  </div>
+
+  <!-- About section -->
+  <div class="w3-container w3-dark-grey w3-center w3-text-light-grey w3-padding-32" id="about">
+    <h4><b>About Hive</b></h4>
+    <img src="https://www.bc.fi/wp-content/uploads/about-hive-logo-wp.jpg" alt="Me" class="w3-image w3-padding-32" width="600" height="650">
+    <div class="w3-content w3-justify" style="max-width:600px">
+      <h4>Hive</h4>
+      <p>Hive Helsinki is a new kind of coding school that preps you to launch your future-proof career through collaborative, project-based learning. No previous coding experience is required. Tuition is free!
+
+		Coding is a high demand skill with endless possiblities. Our 3-year higher-education level program is designed to unlock your potential, whether you aspire to work in top tech companies, solve big problems in the world or create your own products and services.
+      </p>
+      <hr class="w3-opacity">
+      <h4 class="w3-padding-16">Technical Skills</h4>
+      <p class="w3-wide">C</p>
+      <div class="w3-white">
+        <div class="w3-container w3-padding-small w3-center w3-grey" style="width:95%">95%</div>
+      </div>
+      <p class="w3-wide">Debian</p>
+      <div class="w3-white">
+        <div class="w3-container w3-padding-small w3-center w3-grey" style="width:85%">85%</div>
+      </div>
+      <p class="w3-wide">Python</p>
+      <div class="w3-white">
+        <div class="w3-container w3-padding-small w3-center w3-grey" style="width:80%">80%</div>
+      </div>
+      <hr class="w3-opacity">
+
+      <h4 class="w3-padding-16">How much I charge</h4>
+      <div class="w3-row-padding" style="margin:0 -16px">
+        <div class="w3-half w3-margin-bottom">
+          <ul class="w3-ul w3-white w3-center w3-opacity w3-hover-opacity-off">
+            <li class="w3-black w3-xlarge w3-padding-32">Basic</li>
+            <li class="w3-padding-16">Web</li>
+            <li class="w3-padding-16">UNIX</li>
+            <li class="w3-padding-16">Algorithm</li>
+            <li class="w3-padding-16">Graphic</li>
+            <li class="w3-padding-16">
+              <h2>FREE</h2>
+            </li>
+            <li class="w3-light-grey w3-padding-24">
+              <button class="w3-button w3-white w3-padding-large">Sign Up</button>
+            </li>
+          </ul>
+        </div>
+        
+        <div class="w3-half">
+          <ul class="w3-ul w3-white w3-center w3-opacity w3-hover-opacity-off">
+            <li class="w3-black w3-xlarge w3-padding-32">Pro</li>
+            <li class="w3-padding-16">Web</li>
+            <li class="w3-padding-16">UNIX</li>
+            <li class="w3-padding-16">Algorithm</li>
+            <li class="w3-padding-16">Graphic</li>
+            <li class="w3-padding-16">
+              <h2>FREE</h2>
+            </li>
+            <li class="w3-light-grey w3-padding-24">
+              <button class="w3-button w3-white w3-padding-large">Sign Up</button>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contact section -->
+  <div class="w3-container w3-light-grey w3-padding-32 w3-padding-large" id="contact">
+    <div class="w3-content" style="max-width:600px">
+      <h4 class="w3-center"><b>Contact Me</b></h4>
+      <p>Do you want me to join us? Fill out the form and fill me in with the details :) </p>
+      <form action="/action_page.php" target="_blank">
+        <div class="w3-section">
+          <label>Name</label>
+          <input class="w3-input w3-border" type="text" name="Name" required>
+        </div>
+        <div class="w3-section">
+          <label>Email</label>
+          <input class="w3-input w3-border" type="text" name="Email" required>
+        </div>
+        <div class="w3-section">
+          <label>Message</label>
+          <input class="w3-input w3-border" type="text" name="Message" required>
+        </div>
+        <button type="submit" class="w3-button w3-block w3-black w3-margin-bottom">Send Message</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="w3-container w3-padding-32 w3-grey">  
+    <div class="w3-row-padding">
+      <div class="w3-third">
+        <h3>INFO</h3>
+        <p> . No teachers, classes or workbooks<br>
+			. Peer-to-peer learning<br>
+			. Project-based learning<br>
+			. 24/7 campus in Helsinki<br>
+			. No tuition fees!<br>
+			. No experience or degrees required<br>
+			. 3 years full-time study<br>
+			. Gamified curriculum</p>      
+      </div>
+    
+      <div class="w3-third">
+        <h3>BLOG POSTS</h3>
+        <ul class="w3-ul">
+          <li class="w3-padding-16 w3-hover-black">
+            <img src="https://images.ctfassets.net/7oor54l3o0n4/5mZtQYo3KwEggUoUmoqWES/6c8019541969278818812f08520ead41/logo-banner.png" class="w3-left w3-margin-right" style="width:50px">
+            <span class="w3-large">Lorem</span><br>
+            <span>Sed mattis nunc</span>
+          </li>
+          <li class="w3-padding-16 w3-hover-black">
+            <img src="https://images.ctfassets.net/7oor54l3o0n4/5mZtQYo3KwEggUoUmoqWES/6c8019541969278818812f08520ead41/logo-banner.png" class="w3-left w3-margin-right" style="width:50px">
+            <span class="w3-large">Ipsum</span><br>
+            <span>Praes tinci sed</span>
+          </li> 
+        </ul>
+      </div>
+
+      <div class="w3-third">
+        <h3>POPULAR TAGS</h3>
+        <p>
+          <span class="w3-tag w3-black w3-margin-bottom">Nokia</span> <span class="w3-tag w3-dark-grey w3-small w3-margin-bottom">Wolt</span> <span class="w3-tag w3-dark-grey w3-small w3-margin-bottom">London</span>
+          <span class="w3-tag w3-dark-grey w3-small w3-margin-bottom">Zalando</span> <span class="w3-tag w3-dark-grey w3-small w3-margin-bottom">Rovio</span> <span class="w3-tag w3-dark-grey w3-small w3-margin-bottom">DIY</span>
+          <span class="w3-tag w3-dark-grey w3-small w3-margin-bottom">Futurice</span> <span class="w3-tag w3-dark-grey w3-small w3-margin-bottom">Elisa</span> <span class="w3-tag w3-dark-grey w3-small w3-margin-bottom">Family</span>
+          <span class="w3-tag w3-dark-grey w3-small w3-margin-bottom">Reactor</span> <span class="w3-tag w3-dark-grey w3-small w3-margin-bottom">Nvidia</span> <span class="w3-tag w3-dark-grey w3-small w3-margin-bottom">Shopping</span>
+          <span class="w3-tag w3-dark-grey w3-small w3-margin-bottom">Unity</span> <span class="w3-tag w3-dark-grey w3-small w3-margin-bottom">Varjo</span>
+        </p>
+      </div>
+    </div>
+  </footer>
+  
+  <div class="w3-black w3-center w3-padding-24">Powered by <a href="https://www.w3schools.com/w3css/default.asp" title="W3.CSS" target="_blank" class="w3-hover-opacity">w3.css</a></div>
+
+<!-- End page content -->
+</div>
+
+<script>
+// Script to open and close sidebar
+function w3_open() {
+  document.getElementById("mySidebar").style.display = "block";
+  document.getElementById("myOverlay").style.display = "block";
+}
+ 
+function w3_close() {
+  document.getElementById("mySidebar").style.display = "none";
+  document.getElementById("myOverlay").style.display = "none";
+}
+
+// Modal Image Gallery
+function onClick(element) {
+  document.getElementById("img01").src = element.src;
+  document.getElementById("modal01").style.display = "block";
+  var captionText = document.getElementById("caption");
+  captionText.innerHTML = element.alt;
+}
+
+</script>
+
+
+</body>
+</html>
